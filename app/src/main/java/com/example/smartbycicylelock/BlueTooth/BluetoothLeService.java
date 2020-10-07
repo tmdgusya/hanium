@@ -117,7 +117,7 @@ public class BluetoothLeService extends Service {
                 for(byte byteChar : data){
                     stringBuilder.append(String.format("%d ", byteChar));
                 }
-                intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
+                intent.putExtra("BATTERY", new String(data) + "\n" + stringBuilder.toString());
             }
         }
 
@@ -138,7 +138,7 @@ public class BluetoothLeService extends Service {
                 double doubleData = (double)intData * 0.000001;
                 Log.d("ggg", String.valueOf(doubleData));
 
-                intent.putExtra(EXTRA_DATA, new String(data) + "\n" + intData);
+                intent.putExtra("LAT", new String(data) + "\n" + intData);
             }
         }
         // 경도 characteristic 읽기
@@ -157,7 +157,7 @@ public class BluetoothLeService extends Service {
                 double doubleData = (double)intData * 0.000001;
                 Log.d("ggg", String.valueOf(doubleData));
 
-                intent.putExtra(EXTRA_DATA, new String(data) + "\n" + intData);
+                intent.putExtra("LON", new String(data) + "\n" + intData);
             }
         }
         // 지정 UUID가 아닐시
