@@ -33,7 +33,5 @@ public class Database {
                         "battery  VARCHAR(30) NULL, " +
                         "status  VARCHAR(30) NULL, " +
                         "GPS  VARCHAR(50) NULL )";
-
-
     }
 }

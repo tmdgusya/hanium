@@ -94,9 +94,27 @@ public class DBOpenHelper extends SQLiteOpenHelper{
     {
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor;
-        cursor= db.rawQuery("SELECT code from User", null);
+        cursor= db.rawQuery("SELECT * from User where email = 'tudud6@gmail.com';", null);
         while(cursor.moveToNext()) {
-            device_name = cursor.getString(0);
+            device_name = cursor.getString(1);
+        }
+        return device_name;
+    }
+    public String get_email(){
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor;
+        cursor= db.rawQuery("SELECT * from User where email = 'tudud6@gmail.com';", null);
+        while(cursor.moveToNext()) {
+            device_name = cursor.getString(3);
+        }
+        return device_name;
+    }
+    public String get_code(){
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor;
+        cursor= db.rawQuery("SELECT * from User where email = 'tudud6@gmail.com';", null);
+        while(cursor.moveToNext()) {
+            device_name = cursor.getString(4);
         }
         return device_name;
     }
