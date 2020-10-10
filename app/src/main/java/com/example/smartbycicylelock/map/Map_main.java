@@ -3,10 +3,14 @@ package com.example.smartbycicylelock.map;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -14,12 +18,14 @@ import android.nfc.Tag;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.smartbycicylelock.BlueTooth.BluetoothLeService;
+import com.example.smartbycicylelock.BlueTooth.SampleGattAttributes;
 import com.example.smartbycicylelock.R;
 
 import net.daum.mf.map.api.MapPOIItem;
@@ -29,20 +35,49 @@ import net.daum.mf.map.api.MapView;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.UUID;
 
 public class Map_main extends AppCompatActivity {
     private boolean mConnected = false;
-    private String mDeviceAddress;
+    private String mDeviceAddress = "A4:CF:12:86:F6:BA";
     private BluetoothLeService mBluetoothLeService;
-    private String lon;
-    private String lat;
+    private int lon;
+    private int lat;
+
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
+            if (!mBluetoothLeService.initialize()) {
+                Log.e("roach", "Unable to initialize Bluetooth");
+                finish();
+            }
+            // Automatically connects to the device upon successful start-up initialization.
+            mBluetoothLeService.connect(mDeviceAddress);
+            Log.d("ononon", "cool");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBluetoothLeService = null;
+        }
+    };
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_main);
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        String unknownServiceString = getResources().getString(R.string.unknown_service);
+        String uuid = null;
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
+        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
         MapPOIItem customMarker = new MapPOIItem();
+
         MapPoint mappoint = MapPoint.mapPointWithGeoCoord(convert(lat), convert(lon)); // GPS값을 받아오면 여길로 넣어주면됨
 //        MapPoint mappoint = MapPoint.mapPointWithGeoCoord(37.5514579595, 126.951949155); // GPS값을 받아오면 여길로 넣어주면됨
         MapView mapView = new MapView(this);
@@ -78,11 +113,21 @@ public class Map_main extends AppCompatActivity {
 
 
     }
-    double convert(String jwa){
-        int a = Integer.parseInt(jwa, 16);
-        return a*0.000001;
-    }
 
+    double convert(int jwa){
+        return jwa*0.000001;
+    }
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private void aaa(List<BluetoothGattService> gattServices){
+        for (BluetoothGattService gattService : gattServices){
+            Log.d("gattService", String.valueOf(gattService.getCharacteristics()));
+            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
+            for(BluetoothGattCharacteristic characteristic : gattCharacteristics) {
+                mBluetoothLeService.readCharacteristic(characteristic);
+                Log.d("aaaa", String.valueOf(characteristic));
+            }
+        }
+    }
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onResume() {
@@ -101,15 +146,16 @@ public class Map_main extends AppCompatActivity {
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
-                invalidateOptionsMenu();
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
-                invalidateOptionsMenu();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
+                aaa(mBluetoothLeService.getSupportedGattServices());
+
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                lon = intent.getStringExtra("LAT");
-                lat = intent.getStringExtra("LON");
+                lon = intent.getIntExtra("LAT",0);
+                Log.d("lon", String.valueOf(lon));
+                lat = intent.getIntExtra("LON",0);
             }
         }
     };
@@ -124,5 +170,17 @@ public class Map_main extends AppCompatActivity {
         return intentFilter;
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mGattUpdateReceiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(mServiceConnection);
+        mBluetoothLeService = null;
+    }
 
 }
