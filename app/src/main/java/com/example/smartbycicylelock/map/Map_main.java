@@ -85,6 +85,8 @@ public class Map_main extends AppCompatActivity {
         ViewGroup mapViewContainer = findViewById(R.id.map_view);
         mapViewContainer.addView(mapView);
 
+        
+
 //        try{
 //            PackageInfo info =  getPackageManager().getPackageInfo("com.example.smartbycicylelock", PackageManager.GET_SIGNATURES);
 //            for(Signature signature : info.signatures){
@@ -153,9 +155,10 @@ public class Map_main extends AppCompatActivity {
                 aaa(mBluetoothLeService.getSupportedGattServices());
 
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                lon = intent.getIntExtra("LAT",0);
-                Log.d("lon", String.valueOf(lon));
-                lat = intent.getIntExtra("LON",0);
+                lon = intent.getIntExtra(BluetoothLeService.LON,0);
+                Log.d("aaaa", String.valueOf(lon));
+                lat = intent.getIntExtra(BluetoothLeService.LAT, 0);
+                Log.d("bbbb", String.valueOf(lat));
             }
         }
     };
