@@ -47,6 +47,8 @@ public class BluetoothLeService extends Service {
             "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
     public final static String EXTRA_DATA =
             "com.example.bluetooth.le.EXTRA_DATA";
+    public final static String LON = "com.example.bluetooth.le.LON";
+    public final static String LAT = "com.example.bluetooth.le.LAT";
 
     public final static UUID UUID_DISPLAY_RAITING_BATTERY_PERCENT =
             UUID.fromString(SampleGattAttributes.DISPLAY_RAITING_BATTERY_PERCENT);
@@ -137,8 +139,7 @@ public class BluetoothLeService extends Service {
                 // 위도 Double 값 --------
                 double doubleData = (double)intData * 0.000001;
                 Log.d("ggg", String.valueOf(doubleData));
-
-                intent.putExtra("LAT", new String(data) + "\n" + intData);
+                intent.putExtra(LAT, intData);
             }
         }
         // 경도 characteristic 읽기
@@ -150,14 +151,13 @@ public class BluetoothLeService extends Service {
                     stringBuilder.append(String.format("%X", data[i]));
                 }
                 // 경도 String 값
-                String finaldata = stringBuilder.toString().trim();
+                String finaldata = stringBuilder.toString();
                 // 경도 int 값
                 int intData = Integer.parseInt(finaldata, 16);
                 // 경도 Double 값 --------
                 double doubleData = (double)intData * 0.000001;
                 Log.d("ggg", String.valueOf(doubleData));
-
-                intent.putExtra("LON", new String(data) + "\n" + intData);
+                intent.putExtra(LON,intData);
             }
         }
         // 지정 UUID가 아닐시
