@@ -32,6 +32,12 @@ public class SampleGattAttributes {
         // Characteristic UUID
         attributes.put("00002a19-0000-1000-8000-00805f9b34fb", "Display Battery Percent");
 
+        // LAT UUID
+        attributes.put("697c7a96-11e5-4a70-98e3-d5273296e47f", "GPS LAT");
+
+        // LON UUID
+        attributes.put("f099cb58-4ad3-4239-bd2d-6b5724cc9097", "GPS LON");
+
     }
 
     // 특성의 Hash 테이블 이름값 보여주기

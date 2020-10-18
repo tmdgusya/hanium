@@ -70,7 +70,6 @@ public class Map_main extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_main);
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         String unknownServiceString = getResources().getString(R.string.unknown_service);
         String uuid = null;
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -79,7 +78,7 @@ public class Map_main extends AppCompatActivity {
         MapPOIItem customMarker = new MapPOIItem();
 
         MapPoint mappoint = MapPoint.mapPointWithGeoCoord(convert(lat), convert(lon)); // GPS값을 받아오면 여길로 넣어주면됨
-//        MapPoint mappoint = MapPoint.mapPointWithGeoCoord(37.5514579595, 126.951949155); // GPS값을 받아오면 여길로 넣어주면됨
+//        MapPoint mappoint = MapPoint.mapPointWithGeoCoord(37.5514579595, 126.951949155);  GPS값을 받아오면 여길로 넣어주면됨
         MapView mapView = new MapView(this);
         mapView.setZoomLevel(1, true);
         ViewGroup mapViewContainer = findViewById(R.id.map_view);
@@ -111,16 +110,14 @@ public class Map_main extends AppCompatActivity {
         customMarker.setCustomImageAnchor(0.5f, 1.0f); // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
         mapView.addPOIItem(customMarker);
         mapView.setMapCenterPoint(mappoint, true);
-
-
-
     }
+
 
     double convert(int jwa){
         return jwa*0.000001;
     }
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void aaa(List<BluetoothGattService> gattServices){
+    private void get_service_Data(List<BluetoothGattService> gattServices){
         for (BluetoothGattService gattService : gattServices){
             Log.d("gattService", String.valueOf(gattService.getCharacteristics()));
             List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
@@ -137,7 +134,7 @@ public class Map_main extends AppCompatActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-            Log.d("BLE", "Connect request result=" + result);
+            Log.d("roach", "Connect request result=" + result);
         }
     }
 
@@ -152,8 +149,7 @@ public class Map_main extends AppCompatActivity {
                 mConnected = false;
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
-                aaa(mBluetoothLeService.getSupportedGattServices());
-
+                get_service_Data(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 lon = intent.getIntExtra(BluetoothLeService.LON,0);
                 Log.d("aaaa", String.valueOf(lon));
@@ -185,5 +181,7 @@ public class Map_main extends AppCompatActivity {
         unbindService(mServiceConnection);
         mBluetoothLeService = null;
     }
+
+
 
 }
