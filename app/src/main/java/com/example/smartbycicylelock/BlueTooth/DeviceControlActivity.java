@@ -153,6 +153,7 @@ public class DeviceControlActivity extends AppCompatActivity {
                                 mGattCharacteristics.get(groupPosition).get(childPosition);
                         Log.d("position", String.valueOf(characteristic));
                         final int charaProp = characteristic.getProperties();
+
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
                             // If there is an active notification on a characteristic, clear
                             // it first so it doesn't update the data field on the user interface.
@@ -160,12 +161,13 @@ public class DeviceControlActivity extends AppCompatActivity {
                             // false -> true 수정 07/13
                             if (mNotifyCharacteristic != null) {
                                 mBluetoothLeService.setCharacteristicNotification(
-                                        mNotifyCharacteristic, true);
+                                        mNotifyCharacteristic, false);
                                 mNotifyCharacteristic = null;
                             }
                             mBluetoothLeService.readCharacteristic(characteristic);
                         }
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                            Log.d("yoojs", "속성 : " + charaProp);
                             mNotifyCharacteristic = characteristic;
                             mBluetoothLeService.setCharacteristicNotification(
                                     characteristic, true);

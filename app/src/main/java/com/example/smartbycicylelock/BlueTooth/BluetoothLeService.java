@@ -52,6 +52,8 @@ public class BluetoothLeService extends Service {
 
     public final static UUID UUID_DISPLAY_RAITING_BATTERY_PERCENT =
             UUID.fromString(SampleGattAttributes.DISPLAY_RAITING_BATTERY_PERCENT);
+    public final static UUID BATTERY_CHARACTERISTIC_SERVICE =
+            UUID.fromString(SampleGattAttributes.BATTERY_CHARACTERISTIC_SERVICE);
 
     // GATT Callback 함수
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
@@ -293,16 +295,31 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.setCharacteristicNotification(characteristic, true);
+        Log.d("yoojs", "setCharcteristicNotification uuid");
+        Log.d("yoojs", String.valueOf(characteristic.getUuid()));
 
-        if(UUID_DISPLAY_RAITING_BATTERY_PERCENT.equals(characteristic.getUuid()))
+        if (BATTERY_CHARACTERISTIC_SERVICE.equals(characteristic.getUuid()))
         {
-
-            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                    UUID.fromString(SampleGattAttributes.BATTERY_CHARACTERISTIC_SERVICE));
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            mBluetoothGatt.writeDescriptor(descriptor);
+            Log.d("yoojs", "setCharacteristicNotification 호출");
+            List<BluetoothGattDescriptor> descriptor = characteristic.getDescriptors();
+            for(BluetoothGattDescriptor x : descriptor) {
+                Log.d("yoojs", "descriptor : " + String.valueOf(descriptor));
+            }
+            descriptor.get(0).setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            mBluetoothGatt.writeDescriptor(descriptor.get(0));
         }
-
+        // lat = 위도일 때
+        if ("697c7a96-11e5-4a70-98e3-d5273296e47f".equals(characteristic.getUuid())) {
+            List<BluetoothGattDescriptor> descriptor = characteristic.getDescriptors();
+            descriptor.get(0).setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            mBluetoothGatt.writeDescriptor(descriptor.get(0));
+        }
+        // 경도일 때 = lon
+        if ("f099cb58-4ad3-4239-bd2d-6b5724cc9097".equals(characteristic.getUuid())) {
+            List<BluetoothGattDescriptor> descriptor = characteristic.getDescriptors();
+            descriptor.get(0).setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            mBluetoothGatt.writeDescriptor(descriptor.get(0));
+        }
     }
 
     // 연결된 기기에서 지원되는 GATT 서비스 목록 검색
