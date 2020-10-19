@@ -23,6 +23,8 @@ public class SampleGattAttributes {
     private static HashMap<String, String> attributes = new HashMap();
     public static String DISPLAY_RAITING_BATTERY_PERCENT = "0000180f-0000-1000-8000-00805f9b34fb";
     public static String BATTERY_CHARACTERISTIC_SERVICE = "00002a19-0000-1000-8000-00805f9b34fb";
+    public static String LAT = "697c7a96-11e5-4a70-98e3-d5273296e47f";
+    public static String LON = "f099cb58-4ad3-4239-bd2d-6b5724cc9097";
 
     static {
 
