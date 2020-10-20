@@ -62,7 +62,7 @@ public class Map_main extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
             if (!mBluetoothLeService.initialize()) {
-                Log.d(TAG, "Unable to initialize Bluetooth");
+                Log.d("roach", "Unable to initialize Bluetooth");
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
