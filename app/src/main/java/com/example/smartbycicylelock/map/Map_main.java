@@ -133,6 +133,11 @@ public class Map_main extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 setlat();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 setlon();
                 setmapping(lat, lon);
             }
@@ -156,10 +161,17 @@ public class Map_main extends AppCompatActivity {
         mBluetoothLeService.readCharacteristic(characteristic);
     }
     void saveLatData(double data){
-        lat = data;
+        double temp_data = data;
+        if(temp_data != 0){
+            lat = data;
+        }
+
     }
     void saveLonData(double data){
-        lon = data;
+        double temp_data = data;
+        if(temp_data != 0){
+            lon = data;
+        }
     }
     void setmapping(double lat, double lon){
         mappoing = MapPoint.mapPointWithGeoCoord(lat, lon); // GPS값을 받아오면 여길로 넣어주면됨

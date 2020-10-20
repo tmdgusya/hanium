@@ -320,20 +320,6 @@ public class BluetoothLeService extends Service {
             }
             descriptor.get(0).setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor.get(0));
-        } else if (LAT_DATA.equals(characteristic.getUuid())) {
-            List<BluetoothGattDescriptor> descriptor = characteristic.getDescriptors();
-            for(BluetoothGattDescriptor x : descriptor) {
-                Log.d("yoojs", "descriptor : " + String.valueOf(x));
-            }
-            descriptor.get(0).setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            mBluetoothGatt.writeDescriptor(descriptor.get(0));
-        } else if (LON_DATA.equals(characteristic.getUuid())) {
-            List<BluetoothGattDescriptor> descriptor = characteristic.getDescriptors();
-            for(BluetoothGattDescriptor x : descriptor) {
-                Log.d("yoojs", "descriptor : " + String.valueOf(x));
-            }
-            descriptor.get(0).setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            mBluetoothGatt.writeDescriptor(descriptor.get(0));
         }
     }
 
