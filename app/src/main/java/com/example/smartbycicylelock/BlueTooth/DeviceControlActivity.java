@@ -166,7 +166,7 @@ public class DeviceControlActivity extends AppCompatActivity {
                             // false -> true 수정 07/13
                             if (mNotifyCharacteristic != null) {
                                 mBluetoothLeService.setCharacteristicNotification(
-                                        mNotifyCharacteristic, true);
+                                        mNotifyCharacteristic, false);
                                 mNotifyCharacteristic = null;
                             }
                             mBluetoothLeService.readCharacteristic(characteristic);
