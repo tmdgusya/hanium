@@ -19,8 +19,12 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.smartbycicylelock.ExteriorDB.LoginData;
+
 import java.util.List;
 import java.util.UUID;
+
+import retrofit2.http.HEAD;
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class BluetoothLeService extends Service {
@@ -125,7 +129,9 @@ public class BluetoothLeService extends Service {
                 for(byte byteChar : data){
                     stringBuilder.append(String.format("%d ", byteChar));
                 }
+                Log.d("yoojs", "battery값 : "+stringBuilder.toString());
                 intent.putExtra("BATTERY", new String(data) + "\n" + stringBuilder.toString());
+//                intent.putExtra("EXTRA_DATA", new String(data) + "\n" + stringBuilder.toString());
             }
         }
 
@@ -143,8 +149,9 @@ public class BluetoothLeService extends Service {
                 int intData = Integer.parseInt(finaldata, 16);
                 // 위도 Double 값 --------
                 double doubleData = (double)intData * 0.000001;
-                Log.d("ggg", String.valueOf(doubleData));
+                Log.d("yoojs", String.valueOf(doubleData));
                 intent.putExtra(LAT, intData);
+//                intent.putExtra(EXTRA_DATA,intData);
             }
         }
         // 경도 characteristic 읽기
@@ -161,8 +168,9 @@ public class BluetoothLeService extends Service {
                 int intData = Integer.parseInt(finaldata, 16);
                 // 경도 Double 값 --------
                 double doubleData = (double)intData * 0.000001;
-                Log.d("ggg", String.valueOf(doubleData));
+                Log.d("yoojs", String.valueOf(doubleData));
                 intent.putExtra(LON,intData);
+//                intent.putExtra(EXTRA_DATA,intData);
             }
         }
         // 지정 UUID가 아닐시
@@ -173,6 +181,7 @@ public class BluetoothLeService extends Service {
                 for(byte byteChar : data){
                     stringBuilder.append(String.format("%X ", byteChar));
                 }
+                Log.d("yoojs", stringBuilder.toString());
                 intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
             }
         }
@@ -298,28 +307,30 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.setCharacteristicNotification(characteristic, true);
-        Log.d("yoojs", "setCharcteristicNotification uuid");
+      
+        Log.d("yoojs", "setCharcteristicNotification uuid" + String.valueOf(characteristic.getUuid()));
         Log.d("yoojs", String.valueOf(characteristic.getUuid()));
 
-        if (BATTERY_CHARACTERISTIC_SERVICE.equals(characteristic.getUuid()))
+        if(UUID_BATTERY_CHARACTERISTIC_SERVICE.equals(characteristic.getUuid()))
         {
-            Log.d("yoojs", "setCharacteristicNotification 호출");
             List<BluetoothGattDescriptor> descriptor = characteristic.getDescriptors();
             for(BluetoothGattDescriptor x : descriptor) {
-                Log.d("yoojs", "descriptor : " + String.valueOf(descriptor));
+                Log.d("yoojs", "descriptor : " + String.valueOf(x));
             }
             descriptor.get(0).setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor.get(0));
-        }
-        // lat = 위도일 때
-        if ("697c7a96-11e5-4a70-98e3-d5273296e47f".equals(characteristic.getUuid())) {
+        } else if (LAT_DATA.equals(characteristic.getUuid())) {
             List<BluetoothGattDescriptor> descriptor = characteristic.getDescriptors();
+            for(BluetoothGattDescriptor x : descriptor) {
+                Log.d("yoojs", "descriptor : " + String.valueOf(x));
+            }
             descriptor.get(0).setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor.get(0));
-        }
-        // 경도일 때 = lon
-        if ("f099cb58-4ad3-4239-bd2d-6b5724cc9097".equals(characteristic.getUuid())) {
+        } else if (LON_DATA.equals(characteristic.getUuid())) {
             List<BluetoothGattDescriptor> descriptor = characteristic.getDescriptors();
+            for(BluetoothGattDescriptor x : descriptor) {
+                Log.d("yoojs", "descriptor : " + String.valueOf(x));
+            }
             descriptor.get(0).setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor.get(0));
         }
