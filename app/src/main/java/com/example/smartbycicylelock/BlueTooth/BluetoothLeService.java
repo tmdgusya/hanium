@@ -24,6 +24,8 @@ import com.example.smartbycicylelock.ExteriorDB.LoginData;
 import java.util.List;
 import java.util.UUID;
 
+import retrofit2.http.HEAD;
+
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class BluetoothLeService extends Service {
     private final static String TAG = "BluetoothLeService";
@@ -305,7 +307,10 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.setCharacteristicNotification(characteristic, true);
+
+        Log.d("yoojs", "setCharcteristicNotification uuid" + String.valueOf(characteristic.getUuid()));
         Log.d("yoojs", String.valueOf(characteristic.getUuid()));
+
         if(UUID_BATTERY_CHARACTERISTIC_SERVICE.equals(characteristic.getUuid()))
         {
             List<BluetoothGattDescriptor> descriptor = characteristic.getDescriptors();
