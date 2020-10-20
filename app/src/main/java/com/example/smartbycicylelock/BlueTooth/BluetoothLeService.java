@@ -307,7 +307,7 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.setCharacteristicNotification(characteristic, true);
-
+      
         Log.d("yoojs", "setCharcteristicNotification uuid" + String.valueOf(characteristic.getUuid()));
         Log.d("yoojs", String.valueOf(characteristic.getUuid()));
 
@@ -334,7 +334,6 @@ public class BluetoothLeService extends Service {
             descriptor.get(0).setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor.get(0));
         }
-
     }
 
     // 연결된 기기에서 지원되는 GATT 서비스 목록 검색
