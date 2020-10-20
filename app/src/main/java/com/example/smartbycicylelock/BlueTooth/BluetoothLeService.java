@@ -52,8 +52,12 @@ public class BluetoothLeService extends Service {
 
     public final static UUID UUID_DISPLAY_RAITING_BATTERY_PERCENT =
             UUID.fromString(SampleGattAttributes.DISPLAY_RAITING_BATTERY_PERCENT);
-    public final static UUID BATTERY_CHARACTERISTIC_SERVICE =
+    public final static UUID UUID_BATTERY_CHARACTERISTIC_SERVICE =
             UUID.fromString(SampleGattAttributes.BATTERY_CHARACTERISTIC_SERVICE);
+    public final static UUID LAT_DATA =
+            UUID.fromString(SampleGattAttributes.LAT);
+    public final static UUID LON_DATA =
+            UUID.fromString(SampleGattAttributes.LON);
 
     // GATT Callback 함수
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
@@ -89,6 +93,7 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             if(status == BluetoothGatt.GATT_SUCCESS){
                 broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+                Log.d(TAG, "onCharacteristicRead: " + characteristic);
             }
         }
 
@@ -112,7 +117,6 @@ public class BluetoothLeService extends Service {
 
     private void broadcastUpdate(final  String action, final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
-
         // UUID가 배터리 사용량이면
         if (UUID_DISPLAY_RAITING_BATTERY_PERCENT.equals(characteristic.getUuid())) {
             final byte[] data = characteristic.getValue();
@@ -126,7 +130,7 @@ public class BluetoothLeService extends Service {
         }
 
         // 위도 characteristic 읽기
-        else if (UUID.fromString("697c7a96-11e5-4a70-98e3-d5273296e47f").equals(characteristic.getUuid())) {
+        else if (LAT_DATA.equals(characteristic.getUuid())) {
             final byte[] data = characteristic.getValue();
             if (data != null && data.length > 0) {
                 final StringBuilder stringBuilder = new StringBuilder(data.length);
@@ -135,7 +139,6 @@ public class BluetoothLeService extends Service {
                 }
                 // 위도 String 값
                 String finaldata = stringBuilder.toString();
-                Log.d("ggg", finaldata);
                 // 위도 int 값
                 int intData = Integer.parseInt(finaldata, 16);
                 // 위도 Double 값 --------
@@ -145,7 +148,7 @@ public class BluetoothLeService extends Service {
             }
         }
         // 경도 characteristic 읽기
-        else if (UUID.fromString("f099cb58-4ad3-4239-bd2d-6b5724cc9097").equals(characteristic.getUuid())) {
+        else if (LON_DATA.equals(characteristic.getUuid())) {
             final byte[] data = characteristic.getValue();
             if (data != null && data.length > 0) {
                 final StringBuilder stringBuilder = new StringBuilder(data.length);

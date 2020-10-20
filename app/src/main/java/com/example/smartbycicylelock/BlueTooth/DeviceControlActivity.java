@@ -134,7 +134,8 @@ public class DeviceControlActivity extends AppCompatActivity {
                 // Show all the supported services and characteristics on the user interface.
                 displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                display(intent.getIntExtra(BluetoothLeService.LAT, 0));
+                display(intent.getIntExtra(BluetoothLeService.LON, 0));
             }
         }
     };
@@ -143,7 +144,11 @@ public class DeviceControlActivity extends AppCompatActivity {
     // demonstrates 'Read' and 'Notify' features.  See
     // http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
     // list of supported characteristic features.
+    public void display(int data){
+        Log.d("data", String.valueOf(data));
+    }
     private final ExpandableListView.OnChildClickListener servicesListClickListner =
+            // receive data
             new ExpandableListView.OnChildClickListener() {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
@@ -151,7 +156,8 @@ public class DeviceControlActivity extends AppCompatActivity {
                     if (mGattCharacteristics != null) {
                         final BluetoothGattCharacteristic characteristic =
                                 mGattCharacteristics.get(groupPosition).get(childPosition);
-                        Log.d("position", String.valueOf(characteristic));
+                                Log.d("groupPosition", String.valueOf(groupPosition));
+                                Log.d("childPosition", String.valueOf(childPosition));
                         final int charaProp = characteristic.getProperties();
 
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
@@ -250,7 +256,6 @@ public class DeviceControlActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(mGattUpdateReceiver);
-
     }
 
     @Override
