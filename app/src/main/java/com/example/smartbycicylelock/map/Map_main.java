@@ -125,7 +125,6 @@ public class Map_main extends AppCompatActivity {
         mapView.addPOIItem(customMarker);
 
         syncView.bringToFront();
-
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         mapView.setMapCenterPoint(mappoing, true);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -142,6 +141,7 @@ public class Map_main extends AppCompatActivity {
                 setmapping(lat, lon);
             }
         });
+
 
     }
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -178,6 +178,7 @@ public class Map_main extends AppCompatActivity {
         customMarker.setMapPoint(mappoing);
         mapView.addPOIItem(customMarker);
         mapView.setMapCenterPoint(mappoing, true);
+
     }
     double convert(int jwa){
         return jwa*0.000001;
@@ -227,6 +228,12 @@ public class Map_main extends AppCompatActivity {
                 saveLonData(intent.getDoubleExtra(BluetoothLeService.LON, 0.0));
                 Log.d("lat", String.valueOf(lat));
                 Log.d("lon", String.valueOf(lon));
+                if(syncSwitch.isChecked()){
+                    Log.d("exec", "함수실행");
+                    setlat();
+                    setlon();
+                    setmapping(lat, lon);
+                }
             }
         }
     };
