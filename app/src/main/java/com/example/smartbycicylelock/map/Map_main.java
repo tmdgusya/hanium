@@ -25,6 +25,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.smartbycicylelock.BlueTooth.BluetoothLeService;
@@ -47,13 +50,15 @@ public class Map_main extends AppCompatActivity {
     private BluetoothGattCharacteristic mNotifyCharacteristic;
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
             new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
-    private int lon;
-    private int lat;
+    private double lon = 0;
+    private double lat = 0;
     private String TAG = "roach";
     private MapPoint mappoing = MapPoint.mapPointWithGeoCoord(37.5514579595, 126.951949155);
     private MapPOIItem customMarker = new MapPOIItem();
     private ViewGroup mapViewContainer;
-    MapView mapView;
+    private MapView mapView;
+    private Switch syncSwitch;
+    private View syncView;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -82,6 +87,8 @@ public class Map_main extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_main);
+        syncSwitch = (Switch) findViewById(R.id.sync);
+        syncView = (View)findViewById(R.id.sync_view);
         String unknownServiceString = getResources().getString(R.string.unknown_service);
         String uuid = null;
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -116,22 +123,24 @@ public class Map_main extends AppCompatActivity {
         customMarker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
         customMarker.setCustomImageAnchor(0.5f, 1.0f); // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
         mapView.addPOIItem(customMarker);
-        mapView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, "event");
-                setlat();
-                setlon();
-                setmapping(lat,126864775);
-                Log.d(TAG, String.valueOf(convert(lon)));
-                Log.d(TAG, String.valueOf(convert(126864775)));
 
-                return true;
-            }
-        });
+        syncView.bringToFront();
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         mapView.setMapCenterPoint(mappoing, true);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+        syncSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setlat();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                setlon();
+                setmapping(lat, lon);
+            }
+        });
 
 
     }
@@ -146,22 +155,30 @@ public class Map_main extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     void setlon(){
         final BluetoothGattCharacteristic characteristic =
-                mGattCharacteristics.get(4).get(1);
+                mGattCharacteristics.get(5).get(0);
         mNotifyCharacteristic = characteristic;
         mBluetoothLeService.setCharacteristicNotification(mNotifyCharacteristic, true);
         mBluetoothLeService.readCharacteristic(characteristic);
     }
-    void saveLatData(int data){
-        lat = data;
+    void saveLatData(double data){
+        double temp_data = data;
+        if(temp_data != 0){
+            lat = data;
+        }
+
     }
-    void saveLonData(int data){
-        lon = data;
+    void saveLonData(double data){
+        double temp_data = data;
+        if(temp_data != 0){
+            lon = data;
+        }
     }
-    void setmapping(int lat, int lon){
-        mappoing = MapPoint.mapPointWithGeoCoord(convert(lat), convert(lon)); // GPS값을 받아오면 여길로 넣어주면됨
+    void setmapping(double lat, double lon){
+        mappoing = MapPoint.mapPointWithGeoCoord(lat, lon); // GPS값을 받아오면 여길로 넣어주면됨
         customMarker.setMapPoint(mappoing);
         mapView.addPOIItem(customMarker);
         mapView.setMapCenterPoint(mappoing, true);
+
     }
     double convert(int jwa){
         return jwa*0.000001;
@@ -176,8 +193,6 @@ public class Map_main extends AppCompatActivity {
             ArrayList<BluetoothGattCharacteristic> charas =
                     new ArrayList<BluetoothGattCharacteristic>();
             for(BluetoothGattCharacteristic characteristic : gattCharacteristics) {
-//                Log.d("roach", String.valueOf(gattCharacteristics.get(0).getUuid()));
-//                Log.d("roach", String.valueOf(gattCharacteristics.get(0).getUuid()));
                 charas.add(characteristic);
                 mBluetoothLeService.readCharacteristic(characteristic);
                 Log.d(TAG, String.valueOf(characteristic));
@@ -209,15 +224,16 @@ public class Map_main extends AppCompatActivity {
                 // Show all the supported services and characteristics on the user interface.
                 get_service_Data(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                saveLonData(intent.getIntExtra(BluetoothLeService.LON,0));
-                Log.d(TAG, String.valueOf(lon));
-                saveLatData(intent.getIntExtra(BluetoothLeService.LAT, 0));
-                Log.d(TAG, String.valueOf(lat));
-            }else{
-                saveLonData(intent.getIntExtra(BluetoothLeService.LON,0));
-                Log.d(TAG, String.valueOf(lon));
-                saveLatData(intent.getIntExtra(BluetoothLeService.LAT, 0));
-                Log.d(TAG, String.valueOf(lat));
+                saveLatData(intent.getDoubleExtra(BluetoothLeService.LAT, 0.0));
+                saveLonData(intent.getDoubleExtra(BluetoothLeService.LON, 0.0));
+                Log.d("lat", String.valueOf(lat));
+                Log.d("lon", String.valueOf(lon));
+                if(syncSwitch.isChecked()){
+                    Log.d("exec", "함수실행");
+                    setlat();
+                    setlon();
+                    setmapping(lat, lon);
+                }
             }
         }
     };

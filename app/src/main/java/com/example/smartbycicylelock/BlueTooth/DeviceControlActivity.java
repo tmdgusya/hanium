@@ -134,8 +134,8 @@ public class DeviceControlActivity extends AppCompatActivity {
                 // Show all the supported services and characteristics on the user interface.
                 displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                display(intent.getIntExtra(BluetoothLeService.LAT, 0));
-                display(intent.getIntExtra(BluetoothLeService.LON, 0));
+                display(intent.getDoubleExtra(BluetoothLeService.LAT, 0));
+                display(intent.getDoubleExtra(BluetoothLeService.LON, 0));
             }
         }
     };
@@ -144,7 +144,7 @@ public class DeviceControlActivity extends AppCompatActivity {
     // demonstrates 'Read' and 'Notify' features.  See
     // http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
     // list of supported characteristic features.
-    public void display(int data){
+    public void display(double data){
         Log.d("data", String.valueOf(data));
     }
     private final ExpandableListView.OnChildClickListener servicesListClickListner =
