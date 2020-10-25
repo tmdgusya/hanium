@@ -45,7 +45,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class Map_main extends AppCompatActivity {
-    private String mDeviceAddress = "4C:11:AE:D5:1E:3E";
+//    private String mDeviceAddress = "4C:11:AE:D5:1E:3E";
+    private String mDeviceAddress = "A4:CF:12:86:F6:BA"; // default Arduino
     private BluetoothLeService mBluetoothLeService;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
@@ -165,8 +166,8 @@ public class Map_main extends AppCompatActivity {
         if(temp_data != 0){
             lat = data;
         }
-
     }
+
     void saveLonData(double data){
         double temp_data = data;
         if(temp_data != 0){

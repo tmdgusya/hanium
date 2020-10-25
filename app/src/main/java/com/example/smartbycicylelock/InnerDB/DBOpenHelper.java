@@ -40,9 +40,13 @@ public class DBOpenHelper extends SQLiteOpenHelper{
                             "password, " +
                             "email unique, " +
                             "code )";
+            String _CREATEDB =
+                    "create table DB ( " + "lat not null," + "lon not null )";
+
 
 
            db.execSQL(_CREATE);
+           db.execSQL(_CREATEDB);
         }
 
         // 버전이 업데이트 되었을 경우 DB를 다시 만들어 준다.
@@ -140,5 +144,26 @@ public class DBOpenHelper extends SQLiteOpenHelper{
         }
         return  _UserData;
     }
-
+    public void createGPS(){
+        SQLiteDatabase db = getWritableDatabase();
+        StringBuffer sb = new StringBuffer();
+        sb.append("INSERT INTO DB ( ");
+        sb.append("lat, lon) ");
+        sb.append("VALUES ( 37.5514579595, 126.951949155) "); // default GPS data Setting
+        db.execSQL(sb.toString());
+    }
+    public void updateLat(double lat){
+        SQLiteDatabase db = getWritableDatabase();
+        StringBuffer sb = new StringBuffer();
+        sb.append("UPDATE INTO DB ( ");
+        sb.append("lat=" + lat + "where lat = 37.551457959");
+        db.execSQL(sb.toString());
+    }
+    public void updateLon(double lon){
+        SQLiteDatabase db = getWritableDatabase();
+        StringBuffer sb = new StringBuffer();
+        sb.append("UPDATE INTO DB ( ");
+        sb.append("lat=" + lon + "where lat = 37.551457959");
+        db.execSQL(db.toString());
+    }
 }
