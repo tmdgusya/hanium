@@ -53,6 +53,7 @@ public class BluetoothLeService extends Service {
             "com.example.bluetooth.le.EXTRA_DATA";
     public final static String LON = "com.example.bluetooth.le.LON";
     public final static String LAT = "com.example.bluetooth.le.LAT";
+    public final static String LOCK = "com.example.bluetooth.le.LOCK";
     public final static String GPS = "com.example.bluetooth.le.GPS";
 
     public final static UUID UUID_DISPLAY_RAITING_BATTERY_PERCENT =
@@ -172,6 +173,18 @@ public class BluetoothLeService extends Service {
                 Log.d("yoojs", String.valueOf(doubleData));
                 intent.putExtra(LON,doubleData);
 //                intent.putExtra(EXTRA_DATA,intData);
+            }
+        }
+        else if(UUID.fromString("19b10000-e8f2-537e-4f6c-d104768a1214").equals(characteristic.getUuid())){
+            byte[] data = characteristic.getValue();
+            if(data != null && data.length>0){
+                final StringBuilder stringBuilder = new StringBuilder(data.length);
+                for(byte byteChar : data){
+                    stringBuilder.append(String.format("%d ", byteChar));
+                }
+                Log.d("yoojs", "잠값 : "+stringBuilder.toString());
+                intent.putExtra(LOCK, new String(data) + "\n" + stringBuilder.toString());
+//                intent.putExtra("EXTRA_DATA", new String(data) + "\n" + stringBuilder.toString());
             }
         }
         // 지정 UUID가 아닐시

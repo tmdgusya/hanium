@@ -27,11 +27,6 @@ public class Database {
                         "code )";
 
         public static final String _CREATE2 =
-                "create table Device ( "
-                        + "_id integer primary key autoincrement, " +
-                        "devicename VARCHAR(30) NULL, " +
-                        "battery  VARCHAR(30) NULL, " +
-                        "status  VARCHAR(30) NULL, " +
-                        "GPS  VARCHAR(50) NULL )";
+                "create table DB ( " + "lat not null," + "lon not null )";
     }
 }
