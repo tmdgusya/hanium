@@ -2,7 +2,10 @@ package com.example.smartbycicylelock.map;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
@@ -14,6 +17,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.BitmapFactory;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.nfc.Tag;
 import android.os.Binder;
@@ -45,7 +49,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class Map_main extends AppCompatActivity {
-//    private String mDeviceAddress = "4C:11:AE:D5:1E:3E";
+    private static final String NOTIFICATION_CHANNEL_ID = "10001";
+    //    private String mDeviceAddress = "4C:11:AE:D5:1E:3E";
     private String mDeviceAddress = "A4:CF:12:86:F6:BA"; // default Arduino
     private BluetoothLeService mBluetoothLeService;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
@@ -102,20 +107,20 @@ public class Map_main extends AppCompatActivity {
 
 // 앱 Hash값 인식
 //        try{
-//            PackageInfo info =  getPackageManager().getPackageInfo("com.example.smartbycicylelock", PackageManager.GET_SIGNATURES);
-//            for(Signature signature : info.signatures){
-//                MessageDigest md = MessageDigest.getInstance("SHA");
-//                md.update(signature.toByteArray());
-//                Log.d("KeyHash", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-//            }
-//
-//        }catch (PackageManager.NameNotFoundException e)
-//        {
-//            e.printStackTrace();
-//        }catch (NoSuchAlgorithmException e)
-//        {
-//            e.printStackTrace();
-//        }
+////            PackageInfo info =  getPackageManager().getPackageInfo("com.example.smartbycicylelock", PackageManager.GET_SIGNATURES);
+////            for(Signature signature : info.signatures){
+////                MessageDigest md = MessageDigest.getInstance("SHA");
+////                md.update(signature.toByteArray());
+////                Log.d("KeyHash", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+////            }
+////
+////        }catch (PackageManager.NameNotFoundException e)
+////        {
+////            e.printStackTrace();
+////        }catch (NoSuchAlgorithmException e)
+////        {
+////            e.printStackTrace();
+////        }
 
         customMarker.setItemName("자전거 위치");
         customMarker.setTag(1);
@@ -210,6 +215,7 @@ public class Map_main extends AppCompatActivity {
             final boolean result = mBluetoothLeService.connect(mDeviceAddress);
             Log.d(TAG, "Connect request result=" + result);
         }
+        NotificationSomethings();
     }
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -239,6 +245,47 @@ public class Map_main extends AppCompatActivity {
         }
     };
 
+    public void NotificationSomethings() {
+
+
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+
+//        Intent notificationIntent = new Intent(this, ResultActivity.class);
+//        notificationIntent.putExtra("notificationId", count); //전달할 값
+//        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK) ;
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent,  PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground)) //BitMap 이미지 요구
+                .setContentTitle("자전거 도난 경고!!!!!")
+                .setContentText("현재 자전거의 상태를 확인해주세요!!!!")
+                // 더 많은 내용이라서 일부만 보여줘야 하는 경우 아래 주석을 제거하면 setContentText에 있는 문자열 대신 아래 문자열을 보여줌
+                //.setStyle(new NotificationCompat.BigTextStyle().bigText("더 많은 내용을 보여줘야 하는 경우..."))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                .setContentIntent(pendingIntent) // 사용자가 노티피케이션을 탭시 ResultActivity로 이동하도록 설정
+                .setAutoCancel(true);
+
+        //OREO API 26 이상에서는 채널 필요
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            builder.setSmallIcon(R.drawable.ic_launcher_foreground); //mipmap 사용시 Oreo 이상에서 시스템 UI 에러남
+            CharSequence channelName  = "노티페케이션 채널";
+            String descriptio= "오레오 이상을 위한 것임";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName , importance);
+            channel.setDescription("xxxxxxx");
+
+            // 노티피케이션 채널을 시스템에 등록
+            assert notificationManager != null;
+            notificationManager.createNotificationChannel(channel);
+
+        }else builder.setSmallIcon(R.mipmap.ic_launcher); // Oreo 이하에서 mipmap 사용하지 않으면 Couldn't create icon: StatusBarIcon 에러남
+
+        assert notificationManager != null;
+        notificationManager.notify(1234, builder.build()); // 고유숫자로 노티피케이션 동작시킴
+
+    }
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
